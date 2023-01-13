@@ -16,6 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     /**
+     * In-Memory Credential
      * Authentication Provider 는 InMemoryUserDetailsManager 사용.
      * 이건 DB가 아직 없을때 빠르게 프로토타입으로 만들기 적합하다.
      */
