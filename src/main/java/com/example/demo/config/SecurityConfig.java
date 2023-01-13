@@ -2,8 +2,11 @@ package com.example.demo.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,30 +16,39 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+//    /**
+//     * In-Memory Credential
+//     * Authentication Provider 는 InMemoryUserDetailsManager 사용.
+//     * 이건 DB가 아직 없을때 빠르게 프로토타입으로 만들기 적합하다.
+//     */
+//    @Bean
+//    public InMemoryUserDetailsManager userDetailsService() {
+//        // 임의의 3 유저를 하드코딩해서 메모리에 올려두겠다.
+//        UserDetails user1 = User.withUsername("user1")
+//                .password(passwordEncoder().encode("user1Pass"))
+//                .roles("USER")
+//                .build();
+//        UserDetails user2 = User.withUsername("user2")
+//                .password(passwordEncoder().encode("user2Pass"))
+//                .roles("USER")
+//                .build();
+//        UserDetails admin = User.withUsername("admin")
+//                .password(passwordEncoder().encode("adminPass"))
+//                .roles("ADMIN")
+//                .build();
+//        return new InMemoryUserDetailsManager(user1, user2, admin);
+//    }
 
     /**
-     * In-Memory Credential
-     * Authentication Provider 는 InMemoryUserDetailsManager 사용.
-     * 이건 DB가 아직 없을때 빠르게 프로토타입으로 만들기 적합하다.
+     * WebSecurityConfigurerAdaptor deprecated 되어서
+     * WebSecurityCustomizer bean 등록해서 configure() 구현한다.
      */
-    @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        // 임의의 3 유저를 하드코딩해서 메모리에 올려두겠다.
-        UserDetails user1 = User.withUsername("user1")
-                .password(passwordEncoder().encode("user1Pass"))
-                .roles("USER")
-                .build();
-        UserDetails user2 = User.withUsername("user2")
-                .password(passwordEncoder().encode("user2Pass"))
-                .roles("USER")
-                .build();
-        UserDetails admin = User.withUsername("admin")
-                .password(passwordEncoder().encode("adminPass"))
-                .roles("ADMIN")
-                .build();
-        return new InMemoryUserDetailsManager(user1, user2, admin);
-    }
+//    @Bean
+//    public WebSecurityCustomizer configure(AuthenticationManagerBuilder auth) {
+//
+//    }
 
     /**
      * 요청에 대해 인증할때 사용하는 설정
