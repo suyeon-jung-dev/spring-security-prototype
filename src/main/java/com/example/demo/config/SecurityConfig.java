@@ -47,16 +47,26 @@ public class SecurityConfig {
      * anyMatchers() >> 순서가 중요.
      * 더 제한적인 규칙을 먼저 오게 하고, 나중에 갈수록 일반적이고 루즈한 규칙들을 오게 해야한다.
      *
+     * 규칙.
+     * 순서대로 실행되다가 true 가 반환되면 return 한다.
+     *
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf()
                 .disable()
                 .authorizeRequests()
-                    .antMatchers("/home*").hasRole("USER")
-                    .antMatchers("/admin*").hasRole("ADMIN")
-                    .antMatchers("/", "/index").permitAll()
-                    .anyRequest().authenticated()
+                    .antMatchers("/home*")      // /home 하위 url에 대해서는
+                        .hasRole("USER")                    // USER 역할과 일치하는지 확인한다.
+
+                    .antMatchers("/admin*")     // /admin 하위 url에 대해서는
+                        .hasRole("ADMIN")                   // ADMIN 역할과 일히차는지 확인한다.
+
+                    .antMatchers("/", "/index") // /index 페이지는 ( /login url 은 디폴트 )
+                        .permitAll()                        // 모든 사용자의 접근을 허용한다.
+
+                    .anyRequest()                           // 모든 request에 대해서는
+                        .authenticated()                    // 역할과 상관없이 인증된 경우라면 허용한다.
                 .and()
                     .formLogin()
 //                    .loginPage("/login.html")   // spring boot 기본제공 ui 사용할것
