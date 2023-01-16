@@ -27,9 +27,9 @@ public class MemberDetailService implements UserDetailsService {
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
         // todo - 역할 enum 처리 혹은 DB 로 관리
         grantedAuthorities.add(new SimpleGrantedAuthority("USER"));
-        if (email.equals("suyeonjungdev@gmail.com")) {
-            grantedAuthorities.add(new SimpleGrantedAuthority("ADMIN"));
-        }
+//        if (email.equals("suyeonjungdev@gmail.com")) {
+//            grantedAuthorities.add(new SimpleGrantedAuthority("ADMIN"));
+//        }
 
         return new User(member.getEmail(), member.getPassword(), grantedAuthorities);
     }
