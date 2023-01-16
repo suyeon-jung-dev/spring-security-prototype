@@ -13,10 +13,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.frameoptions.WhiteListedAllowFromStrategy;
+import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class SecurityConfig{
 
 //    /**
 //     * In-Memory Credential
@@ -74,24 +79,28 @@ public class SecurityConfig {
                     .antMatchers("/admin*")     // /admin 하위 url에 대해서는
                         .hasRole("ADMIN")                   // ADMIN 역할과 일히차는지 확인한다.
 
-                    .antMatchers("/", "/index") // /index 페이지는 ( /login url 은 디폴트 )
+                    .antMatchers("/", "/index", "/h2-console/**") // /index 페이지는 ( /login url 은 디폴트 )
                         .permitAll()                        // 모든 사용자의 접근을 허용한다.
 
                     .anyRequest()                           // 모든 request에 대해서는
                         .authenticated()                    // 역할과 상관없이 인증된 경우라면 허용한다.
                 .and()
+                    .headers()
+                    .addHeaderWriter(
+                            new XFrameOptionsHeaderWriter(
+                                    new WhiteListedAllowFromStrategy(List.of("localhost"))
+                            )
+                    )
+                    .frameOptions().sameOrigin()
+                .and()
                     .formLogin()
 //                    .loginPage("/login.html")   // spring boot 기본제공 ui 사용할것
-//                    .loginProcessingUrl("/perform_login")
                     .defaultSuccessUrl("/home", true)
                 // todo
 //                    .failureUrl("/login.html?error=true")
 //                    .failureHandler(authenticationFailureHandler())
                 .and()
                     .logout()
-//                .logoutUrl("/perform_logout")
-//                    .invalidateHttpSession(true)
-//                    .deleteCookies("JSESSIONID")
                 .and()
                     .exceptionHandling().accessDeniedPage("/403");
 
@@ -102,9 +111,4 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-//    @Bean
-//    public LoginFailureHandlerImpl authenticationFailureHandler() {
-//        return new LoginFailureHandlerImpl();
-//    }
 }
