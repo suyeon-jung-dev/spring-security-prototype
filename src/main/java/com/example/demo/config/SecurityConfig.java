@@ -2,6 +2,8 @@ package com.example.demo.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -9,13 +11,17 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.frameoptions.WhiteListedAllowFromStrategy;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 
+import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.List;
 
@@ -55,6 +61,32 @@ public class SecurityConfig{
 //
 //    }
 
+
+    /**
+     * JDBC based Authentication
+     */
+    @Bean
+    public DataSource dataSource() {
+        return new EmbeddedDatabaseBuilder()
+                .setType(EmbeddedDatabaseType.H2)
+                .addScript(JdbcDaoImpl.DEFAULT_USER_SCHEMA_DDL_LOCATION)
+                .build();
+    }
+
+    @Bean
+    public UserDetailsManager users(DataSource dataSource) {
+        UserDetails user = User.withUsername("user")
+                .password("password")
+                .roles("USER")
+                .build();
+
+        JdbcUserDetailsManager users = new JdbcUserDetailsManager(dataSource);
+        users.createUser(user);
+
+        return users;
+    }
+
+
     /**
      * 요청에 대해 인증할때 사용하는 설정
      *
@@ -79,7 +111,7 @@ public class SecurityConfig{
                     .antMatchers("/admin*")     // /admin 하위 url에 대해서는
                         .hasRole("ADMIN")                   // ADMIN 역할과 일히차는지 확인한다.
 
-                    .antMatchers("/", "/index", "/h2-console/**") // /index 페이지는 ( /login url 은 디폴트 )
+                    .antMatchers("/", "/index", "/h2-console/**", "/api/**") // /index 페이지는 ( /login url 은 디폴트 )
                         .permitAll()                        // 모든 사용자의 접근을 허용한다.
 
                     .anyRequest()                           // 모든 request에 대해서는
