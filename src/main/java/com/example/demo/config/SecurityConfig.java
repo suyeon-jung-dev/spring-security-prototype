@@ -62,14 +62,14 @@ public class SecurityConfig {
                     .antMatchers("/admin*")     // /admin 하위 url에 대해서는
                         .hasRole("ADMIN")                   // ADMIN 역할과 일히차는지 확인한다.
 
-                    .antMatchers("/", "/index") // /index 페이지는 ( /login url 은 디폴트 )
+                    .antMatchers("/", "/index", "/login") // /index 페이지는 ( /login url 은 디폴트 )
                         .permitAll()                        // 모든 사용자의 접근을 허용한다.
 
                     .anyRequest()                           // 모든 request에 대해서는
                         .authenticated()                    // 역할과 상관없이 인증된 경우라면 허용한다.
                 .and()
                     .formLogin()
-//                    .loginPage("/login.html")   // spring boot 기본제공 ui 사용할것
+                    .loginPage("/login")   // spring boot 기본제공 ui 사용할것
 //                    .loginProcessingUrl("/perform_login")
                     .defaultSuccessUrl("/home", true)
                 // todo

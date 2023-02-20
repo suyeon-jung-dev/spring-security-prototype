@@ -39,6 +39,11 @@ public class LoginController {
         return "/admin";
     }
 
+    @GetMapping("/login")
+    public String login(Principal principal) {
+        return "/login";
+    }
+
     @GetMapping("/403")
     public String forbidden() {
         return "/403";
